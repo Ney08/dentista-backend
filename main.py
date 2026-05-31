@@ -429,12 +429,14 @@ def debug_citas(db: Session = Depends(get_db)):
 
 
 
-@router.put("/citas/{id}/cancelar")
-def cancelar_cita(id: int):
-    cita = db.query(Cita).get(id)
+
+@app.put("/citas/{id}/cancelar")
+def cancelar_cita(id: int, db: Session = Depends(get_db)):
+
+    cita = db.query(models.Cita).filter(models.Cita.id == id).first()
 
     if not cita:
-        raise HTTPException(status_code=404)
+        raise HTTPException(status_code=404, detail="Cita no encontrada")
 
     cita.estado = "cancelada"
     db.commit()
