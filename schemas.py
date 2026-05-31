@@ -1,0 +1,112 @@
+from pydantic import BaseModel
+from typing import List, Optional
+import datetime
+
+
+# ✅ USUARIOS
+class UserCreate(BaseModel):
+    username: str
+    password: str
+
+class UserLogin(BaseModel):
+    username: str
+    password: str
+
+
+class ResetPassword(BaseModel):
+    username: str
+    password: str
+
+# ✅ DIRECCIÓN
+class DireccionBase(BaseModel):
+    provincia_nombre: str = ""
+    municipio_nombre: str = ""
+    distrito_nombre: str = ""
+    seccion_nombre: str = ""
+    barrio_nombre: str = ""
+    calle: str = ""
+
+class Direccion(DireccionBase):
+    id: int
+
+    class Config:
+        from_attributes = True
+
+
+# ✅ CLIENTE
+class ClienteCreate(BaseModel):
+    nombre: str
+    apellido: str
+    cedula: str
+    telefono: str
+    direccion: DireccionBase
+
+class Cliente(ClienteCreate):
+    id: int
+
+    class Config:
+        from_attributes = True
+
+
+# ✅ SERVICIOS (IMPORTANTE 🔥)
+class Servicio(BaseModel):
+    descripcion: str
+    monto: float
+
+
+# ✅ INGRESOS
+class IngresoCreate(BaseModel):
+    cliente_id: int
+    descuento: float = 0
+    servicios: List[Servicio]
+
+class Ingreso(BaseModel):
+    id: int
+    cliente_id: int
+    descuento: float
+    pagado: bool = False
+    servicios: List[Servicio]
+
+    class Config:
+        from_attributes = True
+
+
+# ✅ HISTORIAL
+class HistorialCreate(BaseModel):
+    cliente_id: int
+    descripcion: str
+
+class HistorialOut(BaseModel):
+    id: int
+    cliente_id: int
+    descripcion: str
+    fecha: datetime.datetime
+
+    class Config:
+        from_attributes = True
+
+
+# ✅ CITAS
+
+class CitaCreate(BaseModel):
+    cliente_id: int
+    fecha: datetime.datetime
+
+    # ✅ NUEVO
+    motivo: str
+    detalle: Optional[str] = None
+    
+
+
+class Cita(BaseModel):
+    id: int
+    cliente_id: int
+    fecha: datetime.datetime
+    estado: str
+
+    # ✅ NUEVO
+    motivo: str
+    detalle: Optional[str]
+
+    class Config:
+        from_attributes = True  # ✅ correcto para SQLAlchemy moderno
