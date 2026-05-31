@@ -426,3 +426,17 @@ def completar_cita(id: int, db: Session = Depends(get_db)):
 @app.get("/debug/citas")
 def debug_citas(db: Session = Depends(get_db)):
     return db.query(models.Cita).all()
+
+
+
+@router.put("/citas/{id}/cancelar")
+def cancelar_cita(id: int):
+    cita = db.query(Cita).get(id)
+
+    if not cita:
+        raise HTTPException(status_code=404)
+
+    cita.estado = "cancelada"
+    db.commit()
+
+    return cita
