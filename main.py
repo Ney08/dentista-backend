@@ -442,3 +442,21 @@ def cancelar_cita(id: int, db: Session = Depends(get_db)):
     db.commit()
 
     return cita
+
+@app.put("/citas/{id}")
+def actualizar_cita(id: int, data: CitaCreate, db: Session = Depends(get_db)):
+
+    cita = db.query(models.Cita).filter(models.Cita.id == id).first()
+
+    if not cita:
+        raise HTTPException(status_code=404, detail="Cita no encontrada")
+
+    cita.cliente_id = data.cliente_id
+    cita.fecha = data.fecha
+    cita.motivo = data.motivo
+    cita.detalle = data.detalle
+
+    db.commit()
+    db.refresh(cita)
+
+    return cita
