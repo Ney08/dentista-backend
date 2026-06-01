@@ -190,16 +190,47 @@ def listar_clientes(db: Session = Depends(get_db), cedula: str = None):
 
 
 @app.put("/clientes/{cliente_id}")
-def actualizar_cliente(cliente_id: int, data: dict, db: Session = Depends(get_db)):
+def actualizar_cliente(cliente_id: int, data: ClienteCreate, db: Session = Depends(get_db)):
+
     cliente = db.query(models.Cliente).filter(models.Cliente.id == cliente_id).first()
 
-    if cliente:
-        cliente.nombre = data["nombre"]
-        cliente.telefono = data["telefono"]
-        db.commit()
-        return cliente
+    if not cliente:
+        raise HTTPException(404, "Cliente no encontrado ❌")
 
-    raise HTTPException(404, "Cliente no encontrado")
+    # ✅ actualizar cliente
+    cliente.nombre = data.nombre
+    cliente.apellido = data.apellido
+    cliente.telefono = data.telefono
+
+    # ✅ actualizar dirección
+    direccion = db.query(models.Direccion).filter(
+        models.Direccion.cliente_id == cliente_id
+    ).first()
+
+    if direccion:
+        direccion.provincia_nombre = data.direccion.provincia_nombre
+        direccion.municipio_nombre = data.direccion.municipio_nombre
+        direccion.distrito_nombre = data.direccion.distrito_nombre
+        direccion.barrio_nombre = data.direccion.barrio_nombre
+        direccion.seccion_nombre = data.direccion.seccion_nombre
+        direccion.calle = data.direccion.calle
+
+    else:
+        direccion = models.Direccion(
+            provincia_nombre=data.direccion.provincia_nombre,
+            municipio_nombre=data.direccion.municipio_nombre,
+            distrito_nombre=data.direccion.distrito_nombre,
+            barrio_nombre=data.direccion.barrio_nombre,
+            seccion_nombre=data.direccion.seccion_nombre,
+            calle=data.direccion.calle,
+            cliente_id=cliente_id
+        )
+        db.add(direccion)
+
+    db.commit()
+    db.refresh(cliente)
+
+    return cliente
 
 
 @app.delete("/clientes/{cliente_id}")
