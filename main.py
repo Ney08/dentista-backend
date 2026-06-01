@@ -323,7 +323,7 @@ def listar_ingresos(db: Session = Depends(get_db)):
 
     return data
 
-@router.put("/ingresos/{id}")
+@app.put("/ingresos/{id}")
 def actualizar_ingreso(id: int, data: IngresoUpdateSchema, db: Session = Depends(get_db)):
     
     ingreso = db.query(Ingreso).filter(Ingreso.id == id).first()
