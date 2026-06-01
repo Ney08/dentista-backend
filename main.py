@@ -380,18 +380,60 @@ def actualizar_ingreso(id: int, data: IngresoUpdateSchema, db: Session = Depends
 
 
 
+
+
+
+
 @app.put("/ingresos/{id}/pagar")
 def marcar_pagado(id: int, db: Session = Depends(get_db)):
+
     ingreso = db.query(models.Ingreso).filter(models.Ingreso.id == id).first()
 
     if not ingreso:
-        raise HTTPException(404, "No encontrado")
+        raise HTTPException(status_code=404, detail="No encontrado")
 
+    # ✅ marcar pagado
     ingreso.pagado = True
+
+    # ✅ guardar fecha_pago
+    ingreso.fecha_pago = datetime.utcnow()
+
+    # ✅ 🔥 NUEVO: completar cita automáticamente
+    if ingreso.cita_id:
+        cita = db.query(models.Cita).filter(models.Cita.id == ingreso.cita_id).first()
+        if cita:
+            cita.estado = "completada"
+
     db.commit()
+    db.refresh(ingreso)
 
-    return ingreso
+    # ✅ devolver formato consistente
+    return {
+        "id": ingreso.id,
+        "cliente_id": ingreso.cliente_id,
 
+        "cliente": {
+            "nombre": ingreso.cliente.nombre,
+            "apellido": ingreso.cliente.apellido
+        } if ingreso.cliente else None,
+
+        "servicios": [
+            {
+                "descripcion": s.descripcion,
+                "monto": s.monto
+            }
+            for s in ingreso.servicios
+        ],
+
+        "descuento": ingreso.descuento or 0,
+        "pagado": ingreso.pagado,
+        "fecha_pago": ingreso.fecha_pago,
+
+        # ✅ opcional pero recomendado
+        "cita_id": ingreso.cita_id,
+
+        "created_at": ingreso.created_at
+    }
 
 
 

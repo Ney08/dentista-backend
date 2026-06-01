@@ -64,6 +64,12 @@ class Ingreso(Base):
     
     descuento = Column(Float, default=0)
     pagado = Column(Boolean, default=False)
+    fecha_pago = Column(DateTime, nullable=True)
+    
+    cita_id = Column(Integer, ForeignKey("citas.id"), nullable=True)
+
+    cita = relationship("Cita")
+
 
 
 
