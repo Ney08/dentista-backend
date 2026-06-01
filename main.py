@@ -587,3 +587,11 @@ def actualizar_cita(id: int, data: CitaCreate, db: Session = Depends(get_db)):
     db.refresh(cita)
 
     return cita
+
+
+
+@app.get("/fix-db")
+def fix_db(db: Session = Depends(get_db)):
+    db.execute("ALTER TABLE ingresos ADD COLUMN cita_id INTEGER;")
+    db.commit()
+    return {"ok": True}
