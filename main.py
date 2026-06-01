@@ -5,7 +5,7 @@ from datetime import datetime
 import os
 from sqlalchemy.exc import IntegrityError
 from database import SessionLocal, engine
-
+from sqlalchemy import text
 import models
 from schemas import UserCreate, UserLogin, ClienteCreate, IngresoCreate, HistorialCreate, CitaCreate, ServicioSchema, IngresoUpdateSchema
 from fastapi import APIRouter
@@ -590,8 +590,12 @@ def actualizar_cita(id: int, data: CitaCreate, db: Session = Depends(get_db)):
 
 
 
+
 @app.get("/fix-db")
 def fix_db(db: Session = Depends(get_db)):
-    db.execute("ALTER TABLE ingresos ADD COLUMN cita_id INTEGER;")
-    db.commit()
-    return {"ok": True}
+    try:
+        db.execute(text("ALTER TABLE ingresos ADD COLUMN cita_id INTEGER;"))
+        db.commit()
+        return {"ok": True}
+    except Exception as e:
+        return {"error": str(e)}
