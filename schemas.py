@@ -3,6 +3,10 @@ from typing import List, Optional
 import datetime
 
 
+class ServicioSchema(BaseModel):
+    descripcion: str
+    monto: float
+
 # ✅ USUARIOS
 class UserCreate(BaseModel):
     username: str
@@ -77,6 +81,11 @@ class Ingreso(BaseModel):
 
     class Config:
         from_attributes = True
+
+class IngresoUpdateSchema(BaseModel):
+    cliente_id: int
+    descuento: Optional[float] = 0
+    servicios: List[ServicioSchema]
 
 
 # ✅ HISTORIAL
