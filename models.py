@@ -4,6 +4,9 @@ from database import Base
 from datetime import datetime
 
 
+
+
+
 class User(Base):
     __tablename__ = "users"
 
@@ -26,7 +29,6 @@ class Direccion(Base):
 
     cliente_id = Column(Integer, ForeignKey("clientes.id"))
 
-    # ✅ ESTA LÍNEA ES LA QUE FALTA
     cliente = relationship("Cliente", back_populates="direccion")
 
 
@@ -39,7 +41,7 @@ class Cliente(Base):
     apellido = Column(String) 
     cedula = cedula = Column(String, unique=True, index=True)
     telefono = Column(String)
-    direccion = relationship("Direccion", back_populates="cliente")
+    direccion = relationship("Direccion", back_populates="cliente", uselist=False)
 
     ingresos = relationship("Ingreso", back_populates="cliente")
 
@@ -98,8 +100,7 @@ class Historial(Base):
 
 
 
-from sqlalchemy import Column, Integer, ForeignKey, DateTime, String
-from sqlalchemy.orm import relationship
+
 
 class Cita(Base):
     __tablename__ = "citas"

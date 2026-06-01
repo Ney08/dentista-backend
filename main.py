@@ -175,25 +175,18 @@ def crear_cliente(data: ClienteCreate, db: Session = Depends(get_db)):
 
 
 
+
 @app.get("/clientes/")
-def buscar_clientes(cedula: str = None, db: Session = Depends(get_db)):
+def listar_clientes(db: Session = Depends(get_db), cedula: str = None):
+
+    query = db.query(models.Cliente).options(
+        joinedload(models.Cliente.direccion)
+    )
 
     if cedula:
-        cedula = cedula.strip()
+        return query.filter(models.Cliente.cedula == cedula.strip()).all()
 
-        clientes = db.query(models.Cliente).filter(
-            models.Cliente.cedula == cedula
-        ).all()
-
-        return clientes
-
-    # ✅ si no hay filtro, devuelve todo
-    return db.query(models.Cliente).all()
-
-
-@app.get("/clientes/")
-def listar_clientes(db: Session = Depends(get_db)):
-    return db.query(models.Cliente).all()
+    return query.all()
 
 
 @app.put("/clientes/{cliente_id}")
