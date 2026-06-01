@@ -18,13 +18,17 @@ class ResetPassword(BaseModel):
     password: str
 
 # ✅ DIRECCIÓN
-class DireccionBase(BaseModel):
-    provincia_nombre: str = ""
-    municipio_nombre: str = ""
-    distrito_nombre: str = ""
-    seccion_nombre: str = ""
-    barrio_nombre: str = ""
-    calle: str = ""
+
+
+class Direccion(BaseModel):
+    provincia_nombre: Optional[str] = None
+    municipio_nombre: Optional[str] = None
+    distrito_nombre: Optional[str] = None
+    seccion_nombre: Optional[str] = None
+    barrio_nombre: Optional[str] = None
+    calle: Optional[str] = None
+
+  
 
 class Direccion(DireccionBase):
     id: int
