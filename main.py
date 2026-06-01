@@ -296,7 +296,13 @@ def crear_ingreso(data: IngresoCreate, db: Session = Depends(get_db)):
 @app.get("/ingresos/")
 def listar_ingresos(db: Session = Depends(get_db)):
 
-    ingresos = db.query(models.Ingreso).all()
+    
+    ingresos = db.query(models.Ingreso).options(
+        joinedload(models.Ingreso.cliente),
+        joinedload(models.Ingreso.servicios),
+        joinedload(models.Ingreso.cita)
+        ).all()
+
 
     data = []
 
