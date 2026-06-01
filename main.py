@@ -325,7 +325,7 @@ def listar_ingresos(db: Session = Depends(get_db)):
             # ✅ otros datos
             "descuento": i.descuento or 0,
             "pagado": i.pagado or False,
-            "created_at": i.created_at
+            "created_at": i.created_at.isoformat() if i.created_at else None
         })
 
     print("✅ ENVIANDO INGRESOS:", data)  # DEBUG
@@ -375,7 +375,7 @@ def actualizar_ingreso(id: int, data: IngresoUpdateSchema, db: Session = Depends
         ],
         "descuento": ingreso.descuento or 0,
         "pagado": ingreso.pagado or False,
-        "created_at": ingreso.created_at
+        "created_at": ingreso.created_at.isoformat() if ingreso.created_at else None
     }
 
 
@@ -427,12 +427,12 @@ def marcar_pagado(id: int, db: Session = Depends(get_db)):
 
         "descuento": ingreso.descuento or 0,
         "pagado": ingreso.pagado,
-        "fecha_pago": ingreso.fecha_pago,
+        "fecha_pago": ingreso.fecha_pago.isoformat() if ingreso.fecha_pago else None,
 
         # ✅ opcional pero recomendado
         "cita_id": ingreso.cita_id,
 
-        "created_at": ingreso.created_at
+        "created_at": ingreso.created_at.isoformat() if ingreso.created_at else None 
     }
 
 
