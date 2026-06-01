@@ -534,10 +534,34 @@ def crear_cita(data: CitaCreate, db: Session = Depends(get_db)):
     return cita
 
 
+
 @app.get("/citas/")
 def listar_citas(db: Session = Depends(get_db)):
-    return db.query(models.Cita).all()
 
+    citas = db.query(models.Cita).options(
+        joinedload(models.Cita.cliente) ✅🔥
+    ).all()
+
+    data = []
+
+    for c in citas:
+        data.append({
+            "id": c.id,
+            "cliente_id": c.cliente_id,
+
+            # ✅ ESTO ES LO QUE TE FALTABA
+            "cliente": {
+                "nombre": c.cliente.nombre,
+                "apellido": c.cliente.apellido
+            } if c.cliente else None,
+
+            "fecha": c.fecha.isoformat() if c.fecha else None,
+            "estado": c.estado,
+            "motivo": c.motivo,
+            "detalle": c.detalle
+        })
+
+    return data
 
 
 
