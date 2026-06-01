@@ -539,7 +539,7 @@ def crear_cita(data: CitaCreate, db: Session = Depends(get_db)):
 def listar_citas(db: Session = Depends(get_db)):
 
     citas = db.query(models.Cita).options(
-        joinedload(models.Cita.cliente) ✅🔥
+        joinedload(models.Cita.cliente)
     ).all()
 
     data = []
