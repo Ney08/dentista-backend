@@ -70,6 +70,7 @@ class Servicio(BaseModel):
 class IngresoCreate(BaseModel):
     cliente_id: int
     descuento: float = 0
+    cita_id: Optional[int] = None
     servicios: List[Servicio]
 
 class Ingreso(BaseModel):

@@ -265,7 +265,8 @@ def crear_ingreso(data: IngresoCreate, db: Session = Depends(get_db)):
         ingreso = models.Ingreso(
             cliente_id=data.cliente_id,
             descuento=getattr(data, "descuento", 0) or 0,
-            pagado=False
+            pagado=False,
+            cita_id=getattr(data, "cita_id", None)
         )
 
         db.add(ingreso)
