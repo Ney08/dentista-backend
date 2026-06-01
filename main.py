@@ -303,10 +303,17 @@ def listar_ingresos(db: Session = Depends(get_db)):
     for i in ingresos:
         data.append({
             "id": i.id,
+
+            # ✅🔥 ESTE ERA EL FIX CLAVE
+            "cliente_id": i.cliente_id,
+
+            # ✅ para mostrar nombre en UI
             "cliente": {
                 "nombre": i.cliente.nombre,
                 "apellido": i.cliente.apellido
             } if i.cliente else None,
+
+            # ✅ servicios asociados
             "servicios": [
                 {
                     "descripcion": s.descripcion,
@@ -314,12 +321,14 @@ def listar_ingresos(db: Session = Depends(get_db)):
                 }
                 for s in i.servicios
             ],
+
+            # ✅ otros datos
             "descuento": i.descuento or 0,
             "pagado": i.pagado or False,
             "created_at": i.created_at
         })
 
-    print("ENVIANDO:", data)  # ✅ DEBUG
+    print("✅ ENVIANDO INGRESOS:", data)  # DEBUG
 
     return data
 
