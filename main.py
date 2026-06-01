@@ -323,6 +323,33 @@ def listar_ingresos(db: Session = Depends(get_db)):
 
     return data
 
+@router.put("/ingresos/{id}")
+def actualizar_ingreso(id: int, data: IngresoUpdateSchema, db: Session = Depends(get_db)):
+    
+    ingreso = db.query(Ingreso).filter(Ingreso.id == id).first()
+
+    if not ingreso:
+        raise HTTPException(status_code=404, detail="Ingreso no encontrado")
+
+    ingreso.cliente_id = data.cliente_id
+    ingreso.descuento = data.descuento
+
+    # limpiar servicios actuales
+    db.query(Servicio).filter(Servicio.ingreso_id == id).delete()
+
+    # agregar nuevos servicios
+    for s in data.servicios:
+        nuevo = Servicio(
+            ingreso_id=id,
+            descripcion=s.descripcion,
+            monto=s.monto
+        )
+        db.add(nuevo)
+
+    db.commit()
+    db.refresh(ingreso)
+
+    return ingreso
 
 
 
