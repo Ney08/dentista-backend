@@ -206,8 +206,15 @@ def actualizar_cliente(cliente_id: int, data: ClienteCreate, db: Session = Depen
     direccion = db.query(models.Direccion).filter(
         models.Direccion.cliente_id == cliente_id
     ).first()
+    
+    print("📥 DATA RECIBIDA:", data)
+    print("📍 DIRECCION RECIBIDA:", data.direccion)
 
     if direccion:
+        
+        print("🏙️ PROVINCIA:", data.direccion.provincia_nombre)
+        print("🏘️ MUNICIPIO:", data.direccion.municipio_nombre)
+
         direccion.provincia_nombre = data.direccion.provincia_nombre
         direccion.municipio_nombre = data.direccion.municipio_nombre
         direccion.distrito_nombre = data.direccion.distrito_nombre
