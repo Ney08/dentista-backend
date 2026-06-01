@@ -296,16 +296,16 @@ def crear_ingreso(data: IngresoCreate, db: Session = Depends(get_db)):
 @app.get("/ingresos/")
 def listar_ingresos(db: Session = Depends(get_db)):
 
-    ingresos = db.query(models.Ingreso).options(
-        joinedload(models.Ingreso.cliente),
-        joinedload(models.Ingreso.servicios),
-        joinedload(models.Ingreso.cita)  # ✅🔥 IMPORTANTE
-    ).all()
+    try:
+        ingresos = db.query(models.Ingreso).options(
+            joinedload(models.Ingreso.cliente),
+            joinedload(models.Ingreso.servicios),
+            joinedload(models.Ingreso.cita)
+        ).all()
 
-    data = []
+        data = []
 
-    for i in ingresos:
-        try:
+        for i in ingresos:
             data.append({
                 "id": i.id,
                 "cliente_id": i.cliente_id,
@@ -326,20 +326,18 @@ def listar_ingresos(db: Session = Depends(get_db)):
                 "descuento": i.descuento or 0,
                 "pagado": i.pagado or False,
 
-                # ✅ SIEMPRE SERIALIZA FECHAS
                 "created_at": i.created_at.isoformat() if i.created_at else None,
                 "fecha_pago": i.fecha_pago.isoformat() if i.fecha_pago else None,
 
-                # ✅ opcional pero seguro
                 "cita_id": i.cita_id
             })
 
-        except Exception as e:
-            print("💥 ERROR EN INGRESO:", i.id, e)
+        return data
 
-    print("✅ DATOS FINALES:", data)  # DEBUG
+    except Exception as e:
+        print("💥 ERROR REAL:", e)
+        return {"error": str(e)}
 
-    return data
 
 @app.put("/ingresos/{id}")
 def actualizar_ingreso(id: int, data: IngresoUpdateSchema, db: Session = Depends(get_db)):
