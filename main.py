@@ -296,45 +296,48 @@ def crear_ingreso(data: IngresoCreate, db: Session = Depends(get_db)):
 @app.get("/ingresos/")
 def listar_ingresos(db: Session = Depends(get_db)):
 
-    
     ingresos = db.query(models.Ingreso).options(
         joinedload(models.Ingreso.cliente),
         joinedload(models.Ingreso.servicios),
-        joinedload(models.Ingreso.cita)
-        ).all()
-
+        joinedload(models.Ingreso.cita)  # ✅🔥 IMPORTANTE
+    ).all()
 
     data = []
 
     for i in ingresos:
-        data.append({
-            "id": i.id,
+        try:
+            data.append({
+                "id": i.id,
+                "cliente_id": i.cliente_id,
 
-            # ✅🔥 ESTE ERA EL FIX CLAVE
-            "cliente_id": i.cliente_id,
+                "cliente": {
+                    "nombre": i.cliente.nombre,
+                    "apellido": i.cliente.apellido
+                } if i.cliente else None,
 
-            # ✅ para mostrar nombre en UI
-            "cliente": {
-                "nombre": i.cliente.nombre,
-                "apellido": i.cliente.apellido
-            } if i.cliente else None,
+                "servicios": [
+                    {
+                        "descripcion": s.descripcion,
+                        "monto": s.monto
+                    }
+                    for s in i.servicios
+                ],
 
-            # ✅ servicios asociados
-            "servicios": [
-                {
-                    "descripcion": s.descripcion,
-                    "monto": s.monto
-                }
-                for s in i.servicios
-            ],
+                "descuento": i.descuento or 0,
+                "pagado": i.pagado or False,
 
-            # ✅ otros datos
-            "descuento": i.descuento or 0,
-            "pagado": i.pagado or False,
-            "created_at": i.created_at.isoformat() if i.created_at else None
-        })
+                # ✅ SIEMPRE SERIALIZA FECHAS
+                "created_at": i.created_at.isoformat() if i.created_at else None,
+                "fecha_pago": i.fecha_pago.isoformat() if i.fecha_pago else None,
 
-    print("✅ ENVIANDO INGRESOS:", data)  # DEBUG
+                # ✅ opcional pero seguro
+                "cita_id": i.cita_id
+            })
+
+        except Exception as e:
+            print("💥 ERROR EN INGRESO:", i.id, e)
+
+    print("✅ DATOS FINALES:", data)  # DEBUG
 
     return data
 
