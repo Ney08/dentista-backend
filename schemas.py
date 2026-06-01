@@ -18,9 +18,7 @@ class ResetPassword(BaseModel):
     password: str
 
 # ✅ DIRECCIÓN
-
-
-class Direccion(BaseModel):
+class DireccionBase(BaseModel):
     provincia_nombre: Optional[str] = None
     municipio_nombre: Optional[str] = None
     distrito_nombre: Optional[str] = None
@@ -28,13 +26,19 @@ class Direccion(BaseModel):
     barrio_nombre: Optional[str] = None
     calle: Optional[str] = None
 
-  
 
+# ✅ CREATE / INPUT
+class DireccionCreate(DireccionBase):
+    pass
+
+
+# ✅ RESPONSE
 class Direccion(DireccionBase):
     id: int
 
     class Config:
         from_attributes = True
+
 
 
 # ✅ CLIENTE
