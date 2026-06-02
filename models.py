@@ -121,5 +121,6 @@ class Cita(Base):
     # ✅ NUEVOS CAMPOS
     motivo = Column(String)
     detalle = Column(String, nullable=True)
+    duracion = Column(Integer, default=30)
 
     cliente = relationship("Cliente")

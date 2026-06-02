@@ -524,7 +524,8 @@ def crear_cita(data: CitaCreate, db: Session = Depends(get_db)):
         cliente_id=data.cliente_id,
         fecha=data.fecha,
         motivo=data.motivo,         # ✅ NUEVO
-        detalle=data.detalle or None  # ✅ NUEVO
+        detalle=data.detalle or None,  # ✅ NUEVO
+        duracion=data.duracion or 30   # ✅ NUEVO
     )
 
     db.add(cita)
@@ -558,7 +559,8 @@ def listar_citas(db: Session = Depends(get_db)):
             "fecha": c.fecha.isoformat() if c.fecha else None,
             "estado": c.estado,
             "motivo": c.motivo,
-            "detalle": c.detalle
+            "detalle": c.detalle,
+            "duracion": c.duracion
         })
 
     return data
@@ -614,6 +616,7 @@ def actualizar_cita(id: int, data: CitaCreate, db: Session = Depends(get_db)):
     cita.fecha = data.fecha
     cita.motivo = data.motivo
     cita.detalle = data.detalle
+    cita.duracion = data.duracion
 
     db.commit()
     db.refresh(cita)

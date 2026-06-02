@@ -110,10 +110,10 @@ class CitaCreate(BaseModel):
     cliente_id: int
     fecha: datetime.datetime
 
-    # ✅ NUEVO
+   
     motivo: str
     detalle: Optional[str] = None
-    
+    duracion: int = 30
 
 
 class Cita(BaseModel):
@@ -122,9 +122,9 @@ class Cita(BaseModel):
     fecha: datetime.datetime
     estado: str
 
-    # ✅ NUEVO
+   
     motivo: str
     detalle: Optional[str]
-
+    duracion: int
     class Config:
-        from_attributes = True  # ✅ correcto para SQLAlchemy moderno
+        from_attributes = True  
