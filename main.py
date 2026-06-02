@@ -627,10 +627,11 @@ def actualizar_cita(id: int, data: CitaCreate, db: Session = Depends(get_db)):
 
 
 
+
 @app.get("/fix-db")
 def fix_db(db: Session = Depends(get_db)):
     try:
-        db.execute(text("ALTER TABLE ingresos ADD COLUMN fecha_pago TIMESTAMP;"))
+        db.execute(text("ALTER TABLE citas ADD COLUMN duracion INTEGER DEFAULT 30;"))
         db.commit()
         return {"ok": True}
     except Exception as e:
