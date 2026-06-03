@@ -87,6 +87,23 @@ def login(data: UserLogin, db: Session = Depends(get_db)):
         "user": user.username
     }
 
+
+
+@app.put("/users/reset")
+def reset_password(data: UserCreate, db: Session = Depends(get_db)):
+
+    user = db.query(models.User).filter(models.User.username == data.username).first()
+
+    if not user:
+        raise HTTPException(404, "Usuario no encontrado ❌")
+
+    user.password = hash_password(data.password)
+
+    db.commit()
+
+    return {"msg": "Contraseña actualizada ✅"}
+
+
 @app.put("/users/{user_id}")
 def actualizar_usuario(user_id: int, data: UserUpdate, db: Session = Depends(get_db)):
 
@@ -104,23 +121,6 @@ def actualizar_usuario(user_id: int, data: UserUpdate, db: Session = Depends(get
     db.commit()
 
     return {"msg": "Usuario actualizado ✅"}
-
-
-
-
-@app.put("/users/reset")
-def reset_password(data: UserCreate, db: Session = Depends(get_db)):
-
-    user = db.query(models.User).filter(models.User.username == data.username).first()
-
-    if not user:
-        raise HTTPException(404, "Usuario no encontrado ❌")
-
-    user.password = hash_password(data.password)
-
-    db.commit()
-
-    return {"msg": "Contraseña actualizada ✅"}
 
 
 # =========================
