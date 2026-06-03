@@ -10,6 +10,7 @@ import models
 from schemas import UserCreate, UserLogin, ClienteCreate, IngresoCreate, HistorialCreate, CitaCreate, ServicioSchema, IngresoUpdateSchema, UserUpdate
 from fastapi import APIRouter
 from fastapi import HTTPException, Depends
+from typing import Optional
 import re
 
 router = APIRouter()
@@ -174,13 +175,14 @@ def crear_cliente(data: ClienteCreate, db: Session = Depends(get_db)):
 
 
 
-from typing import Optional
+
+
 
 @app.get("/clientes/")
 def listar_clientes(
     db: Session = Depends(get_db),
     cedula: Optional[str] = None,
-    activos: Optional[bool] = True
+    activos: Optional[str] = Query("true")
 ):
 
     query = db.query(models.Cliente).options(
@@ -192,10 +194,13 @@ def listar_clientes(
             models.Cliente.cedula == cedula.strip()
         ).all()
 
-    if activos is not None:
-        query = query.filter(models.Cliente.activo == activos)
+    # ✅ CONVERSIÓN SEGURA (CLAVE 🔥)
+    activos_bool = activos.lower() == "true"
 
-    return query.all()
+    return query.filter(
+        models.Cliente.activo == activos_bool
+    ).all()
+
 
 
 
