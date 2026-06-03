@@ -179,28 +179,19 @@ def crear_cliente(data: ClienteCreate, db: Session = Depends(get_db)):
 
 
 
+
+
 @app.get("/clientes/")
 def listar_clientes(
     db: Session = Depends(get_db),
-    cedula: Optional[str] = None,
-    activos: Optional[str] = Query("true")
+    activos: Optional[bool] = True
 ):
 
     query = db.query(models.Cliente).options(
         joinedload(models.Cliente.direccion)
     )
 
-    if cedula:
-        return query.filter(
-            models.Cliente.cedula == cedula.strip()
-        ).all()
-
-    # ✅ CONVERSIÓN SEGURA (CLAVE 🔥)
-    activos_bool = activos.lower() == "true"
-
-    return query.filter(
-        models.Cliente.activo == activos_bool
-    ).all()
+    return query.filter(models.Cliente.activo == activos).all()
 
 
 

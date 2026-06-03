@@ -39,7 +39,7 @@ class Cliente(Base):
 
     nombre = Column(String)
     apellido = Column(String) 
-    cedula = cedula = Column(String, unique=True, index=True)
+    cedula = Column(String, unique=True, index=True)
     telefono = Column(String)
     direccion = relationship("Direccion", back_populates="cliente", uselist=False)
     activo = Column(Boolean, default=True)
