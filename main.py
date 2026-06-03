@@ -182,12 +182,22 @@ def crear_cliente(data: ClienteCreate, db: Session = Depends(get_db)):
 
 
 
+
 @app.get("/clientes/")
-def listar_clientes(db: Session = Depends(get_db)):
+def listar_clientes(
+    activos: Optional[bool] = Query(None),
+    db: Session = Depends(get_db)
+):
     
-    return db.query(models.Cliente).options(
+    query = db.query(models.Cliente).options(
         joinedload(models.Cliente.direccion)
-    ).all()
+    )
+
+    # ✅ FILTRO NUEVO
+    if activos is not None:
+        query = query.filter(models.Cliente.activo == activos)
+
+    return query.all()
 
 
 
@@ -659,12 +669,6 @@ from sqlalchemy import text
 @app.get("/fix-db")
 def fix_db(db: Session = Depends(get_db)):
     try:
-        # ✅ agregar columna duracion en citas
-        db.execute(text(
-            "ALTER TABLE citas ADD COLUMN duracion INTEGER DEFAULT 30;"
-        ))
-
-        # ✅ agregar columna activo en clientes
         db.execute(text(
             "ALTER TABLE clientes ADD COLUMN activo BOOLEAN DEFAULT TRUE;"
         ))
