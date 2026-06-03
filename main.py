@@ -181,17 +181,14 @@ def crear_cliente(data: ClienteCreate, db: Session = Depends(get_db)):
 
 
 
+
 @app.get("/clientes/")
-def listar_clientes(
-    db: Session = Depends(get_db),
-    activos: Optional[bool] = True
-):
-
-    query = db.query(models.Cliente).options(
+def listar_clientes(db: Session = Depends(get_db)):
+    
+    return db.query(models.Cliente).options(
         joinedload(models.Cliente.direccion)
-    )
+    ).all()
 
-    return query.filter(models.Cliente.activo == activos).all()
 
 
 
