@@ -135,12 +135,14 @@ def actualizar_usuario(user_id: int, data: UserUpdate, db: Session = Depends(get
 def crear_cliente(data: ClienteCreate, db: Session = Depends(get_db)):
 
     # ✅ limpiar cédula
-    cedula = data.cedula.strip()
+    cedula = re.sub(r"\D", "", data.cedula.strip())
 
     # ✅ VALIDAR SI YA EXISTE
+    
     existe = db.query(models.Cliente).filter(
         models.Cliente.cedula == cedula
     ).first()
+
 
     
     if existe:
