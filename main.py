@@ -13,6 +13,7 @@ from fastapi import HTTPException, Depends
 from fastapi import Query
 from typing import Optional
 import re
+import uuid
 
 router = APIRouter()
 
@@ -141,8 +142,10 @@ def crear_cliente(data: ClienteCreate, db: Session = Depends(get_db)):
         models.Cliente.cedula == cedula
     ).first()
 
+    
     if existe:
-        return {"error": "La cédula ya está registrada ❌"}
+        raise HTTPException(400, "La cédula ya está registrada ❌")
+
 
     # ✅ crear cliente
     nuevo_cliente = models.Cliente(
@@ -279,11 +282,16 @@ def activar_cliente(cliente_id: int, db: Session = Depends(get_db)):
     cliente = db.query(models.Cliente).filter(
         models.Cliente.id == cliente_id
     ).first()
-
+    
+    if not cliente:
+        raise HTTPException(404, "Cliente no encontrado")
+    
     cliente.activo = True
 
     db.commit()
     db.refresh(cliente)
+    
+    
 
     return {"message": "Cliente activado ✅"}
 
@@ -491,7 +499,10 @@ async def guardar_factura(
     file: UploadFile = File(...),
     ingreso_id: int = Form(...)
 ):
-    ruta = f"facturas/{file.filename}"
+    
+    filename = f"{uuid.uuid4()}_{file.filename}"
+    ruta = f"facturas/{filename}"
+
 
     with open(ruta, "wb") as f:
         f.write(await file.read())
@@ -664,22 +675,22 @@ def actualizar_cita(id: int, data: CitaCreate, db: Session = Depends(get_db)):
 
 
 
-from sqlalchemy import text
+# from sqlalchemy import text
 
-@app.get("/fix-db")
-def fix_db(db: Session = Depends(get_db)):
-    try:
-        db.execute(text(
-            "ALTER TABLE clientes ADD COLUMN activo BOOLEAN DEFAULT TRUE;"
-        ))
+# @app.get("/fix-db")
+# def fix_db(db: Session = Depends(get_db)):
+#     try:
+#         db.execute(text(
+#             "ALTER TABLE clientes ADD COLUMN activo BOOLEAN DEFAULT TRUE;"
+#         ))
 
-        db.commit()
+#         db.commit()
 
-        return {
-            "ok": True,
-            "message": "Columnas agregadas ✅"
-        }
+#         return {
+#             "ok": True,
+#             "message": "Columnas agregadas ✅"
+#         }
 
-    except Exception as e:
-        db.rollback()
-        return {"error": str(e)}
+#     except Exception as e:
+#         db.rollback()
+#         return {"error": str(e)}
