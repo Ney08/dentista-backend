@@ -147,7 +147,7 @@ def crear_cliente(data: ClienteCreate, db: Session = Depends(get_db)):
         nombre=data.nombre,
         apellido=data.apellido,
         cedula=cedula,
-        telefono=data.telefono
+        telefono=data.telefono,
         activo=True
     )
 
