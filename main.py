@@ -10,6 +10,7 @@ import models
 from schemas import UserCreate, UserLogin, ClienteCreate, IngresoCreate, HistorialCreate, CitaCreate, ServicioSchema, IngresoUpdateSchema, UserUpdate
 from fastapi import APIRouter
 from fastapi import HTTPException, Depends
+import re
 
 router = APIRouter()
 
@@ -127,11 +128,6 @@ def actualizar_usuario(user_id: int, data: UserUpdate, db: Session = Depends(get
 # CLIENTES
 # =========================
 
-
-
-
-import re
-
 @app.post("/clientes/")
 def crear_cliente(data: ClienteCreate, db: Session = Depends(get_db)):
 
@@ -152,6 +148,7 @@ def crear_cliente(data: ClienteCreate, db: Session = Depends(get_db)):
         apellido=data.apellido,
         cedula=cedula,
         telefono=data.telefono
+        activo=True
     )
 
     db.add(nuevo_cliente)
@@ -178,7 +175,11 @@ def crear_cliente(data: ClienteCreate, db: Session = Depends(get_db)):
 
 
 @app.get("/clientes/")
-def listar_clientes(db: Session = Depends(get_db), cedula: str = None):
+def listar_clientes(
+    db: Session = Depends(get_db),
+    cedula: str = None,
+    activos: bool = True  # ✅ nuevo parámetro
+):
 
     query = db.query(models.Cliente).options(
         joinedload(models.Cliente.direccion)
@@ -187,7 +188,8 @@ def listar_clientes(db: Session = Depends(get_db), cedula: str = None):
     if cedula:
         return query.filter(models.Cliente.cedula == cedula.strip()).all()
 
-    return query.all()
+    return query.filter(models.Cliente.activo == activos).all()
+
 
 
 @app.put("/clientes/{cliente_id}")
@@ -202,7 +204,7 @@ def actualizar_cliente(cliente_id: int, data: ClienteCreate, db: Session = Depen
     cliente.nombre = data.nombre
     cliente.apellido = data.apellido
     cliente.telefono = data.telefono
-
+    cliente.activo = True
     # ✅ actualizar dirección
     direccion = db.query(models.Direccion).filter(
         models.Direccion.cliente_id == cliente_id
@@ -241,16 +243,38 @@ def actualizar_cliente(cliente_id: int, data: ClienteCreate, db: Session = Depen
     return cliente
 
 
-@app.delete("/clientes/{cliente_id}")
-def eliminar_cliente(cliente_id: int, db: Session = Depends(get_db)):
-    cliente = db.query(models.Cliente).filter(models.Cliente.id == cliente_id).first()
+@app.put("/clientes/{cliente_id}/desactivar")
+def desactivar_cliente(cliente_id: int, db: Session = Depends(get_db)):
 
-    if cliente:
-        db.delete(cliente)
-        db.commit()
-        return {"mensaje": "Cliente eliminado"}
+    cliente = db.query(models.Cliente).filter(
+        models.Cliente.id == cliente_id
+    ).first()
 
-    raise HTTPException(404, "Cliente no encontrado")
+    if not cliente:
+        raise HTTPException(404, "Cliente no encontrado")
+
+    cliente.activo = False
+
+    db.commit()
+    db.refresh(cliente)
+
+    return {"message": "Cliente desactivado ✅"}
+
+
+
+@app.put("/clientes/{cliente_id}/activar")
+def activar_cliente(cliente_id: int, db: Session = Depends(get_db)):
+
+    cliente = db.query(models.Cliente).filter(
+        models.Cliente.id == cliente_id
+    ).first()
+
+    cliente.activo = True
+
+    db.commit()
+    db.refresh(cliente)
+
+    return {"message": "Cliente activado ✅"}
 
 
 # =========================

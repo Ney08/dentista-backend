@@ -58,6 +58,7 @@ class ClienteCreate(BaseModel):
     cedula: str
     telefono: str
     direccion: DireccionBase
+    activo: bool = True
 
 class Cliente(ClienteCreate):
     id: int
