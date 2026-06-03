@@ -174,11 +174,13 @@ def crear_cliente(data: ClienteCreate, db: Session = Depends(get_db)):
 
 
 
+from typing import Optional
+
 @app.get("/clientes/")
 def listar_clientes(
     db: Session = Depends(get_db),
-    cedula: str = None,
-    activos: bool = True  # ✅ nuevo parámetro
+    cedula: Optional[str] = None,
+    activos: Optional[bool] = True
 ):
 
     query = db.query(models.Cliente).options(
@@ -186,9 +188,14 @@ def listar_clientes(
     )
 
     if cedula:
-        return query.filter(models.Cliente.cedula == cedula.strip()).all()
+        return query.filter(
+            models.Cliente.cedula == cedula.strip()
+        ).all()
 
-    return query.filter(models.Cliente.activo == activos).all()
+    if activos is not None:
+        query = query.filter(models.Cliente.activo == activos)
+
+    return query.all()
 
 
 
@@ -653,11 +660,28 @@ def actualizar_cita(id: int, data: CitaCreate, db: Session = Depends(get_db)):
 
 
 
+from sqlalchemy import text
+
 @app.get("/fix-db")
 def fix_db(db: Session = Depends(get_db)):
     try:
-        db.execute(text("ALTER TABLE citas ADD COLUMN duracion INTEGER DEFAULT 30;"))
+        # ✅ agregar columna duracion en citas
+        db.execute(text(
+            "ALTER TABLE citas ADD COLUMN duracion INTEGER DEFAULT 30;"
+        ))
+
+        # ✅ agregar columna activo en clientes
+        db.execute(text(
+            "ALTER TABLE clientes ADD COLUMN activo BOOLEAN DEFAULT TRUE;"
+        ))
+
         db.commit()
-        return {"ok": True}
+
+        return {
+            "ok": True,
+            "message": "Columnas agregadas ✅"
+        }
+
     except Exception as e:
+        db.rollback()
         return {"error": str(e)}
