@@ -10,6 +10,7 @@ import models
 from schemas import UserCreate, UserLogin, ClienteCreate, IngresoCreate, HistorialCreate, CitaCreate, ServicioSchema, IngresoUpdateSchema, UserUpdate
 from fastapi import APIRouter
 from fastapi import HTTPException, Depends
+from fastapi import Query
 from typing import Optional
 import re
 
