@@ -1,7 +1,7 @@
 from sqlalchemy import Boolean, Column, Integer, String, ForeignKey, DateTime, Float
 from sqlalchemy.orm import relationship
 from database import Base
-from datetime import datetime
+from datetime import datetime, timezone
 
 
 
@@ -50,7 +50,9 @@ class Ingreso(Base):
     __tablename__ = "ingresos"
 
     id = Column(Integer, primary_key=True, index=True)
-    created_at = Column(DateTime, default=datetime.utcnow)
+    
+    created_at = Column(DateTime(timezone=True),default=lambda: datetime.now(timezone.utc))
+
 
     cliente_id = Column(Integer, ForeignKey("clientes.id"))
 
@@ -64,7 +66,9 @@ class Ingreso(Base):
     
     descuento = Column(Float, default=0)
     pagado = Column(Boolean, default=False)
-    fecha_pago = Column(DateTime, nullable=True)
+    
+    fecha_pago = Column(DateTime(timezone=True),nullable=True)
+
     
     cita_id = Column(Integer, ForeignKey("citas.id"), nullable=True)
 
