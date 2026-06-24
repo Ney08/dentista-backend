@@ -1,0 +1,52 @@
+# =========================
+# ENV / SECRETS
+# =========================
+.env
+*.env
+backend/.env
+
+# =========================
+# SQLITE DATABASE
+# =========================
+*.db
+*.sqlite
+*.sqlite3
+backend/*.db
+backend/*.sqlite
+backend/*.sqlite3
+
+# =========================
+# BACKUPS
+# =========================
+*.backup
+*.bak
+*.dump
+*_backup*
+
+# =========================
+# PYTHON
+# =========================
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+venv/
+backend/venv/
+
+# =========================
+# NODE / REACT
+# =========================
+node_modules/
+build/
+dist/
+
+# =========================
+# TAURI / RUST
+# =========================
+src-tauri/target/
+
+# =========================
+# GENERATED FILES
+# =========================
+facturas/
+backend/facturas/
